@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-body bg-paper-50 text-ink-900 antialiased transition-colors duration-200;
+  }
+
+  html.dark body {
+    @apply bg-ink-950 text-paper-50;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+
+  /* Visible keyboard focus everywhere */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-amber-500 ring-offset-2 ring-offset-paper-50;
+  }
+
+  html.dark a:focus-visible,
+  html.dark button:focus-visible,
+  html.dark input:focus-visible,
+  html.dark textarea:focus-visible,
+  html.dark [tabindex]:focus-visible {
+    @apply ring-offset-ink-950;
+  }
+
+  .tabular {
+    @apply font-mono tabular-nums;
+  }
+}
+
+@layer components {
+  /* Signature element: the admit-card stub used for hero stat clusters.
+     A ticket/boarding-pass silhouette — the one bold move on the page. */
+  .admit-card {
+    position: relative;
+    background: linear-gradient(135deg, theme("colors.ink.800"), theme("colors.ink.900"));
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  html:not(.dark) .admit-card {
+    background: linear-gradient(135deg, #1c2a4a, #16213a);
+  }
+
+  .admit-card::before,
+  .admit-card::after {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: theme("colors.paper.50");
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  html.dark .admit-card::before,
+  html.dark .admit-card::after {
+    background: theme("colors.ink.950");
+  }
+
+  .admit-card::before {
+    left: -11px;
+  }
+
+  .admit-card::after {
+    right: -11px;
+  }
+
+  .admit-card-stub {
+    border-left: 2px dashed rgba(246, 245, 241, 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
