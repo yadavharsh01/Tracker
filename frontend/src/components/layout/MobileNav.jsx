@@ -6,7 +6,7 @@ import { useTheme } from "../../context/ThemeContext";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/mock-tests", label: "Mocks", icon: ClipboardList },
-  { to: "/planner", label: "Topics", icon: BookOpen },
+  { to: "/planner", label: "Planner", icon: BookOpen },
 ];
 
 export default function MobileNav() {

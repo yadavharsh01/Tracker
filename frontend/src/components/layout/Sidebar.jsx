@@ -6,7 +6,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/mock-tests", label: "Mock tests", icon: ClipboardList },
-  { to: "/planner", label: "Topic tracker", icon: BookOpen },
+  { to: "/planner", label: "Planner", icon: BookOpen },
 ];
 
 export default function Sidebar() {

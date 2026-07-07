@@ -103,3 +103,14 @@ frontend/src/
 
 Skipped this round (by user's choice): AI weak-area coach — needs an LLM API key,
 can be added later.
+
+## Round 4 — calendar planner view
+
+frontend/src/components/planner/MonthCalendar.jsx
+  Month grid calendar (7 cols, prev/next nav), color intensity per day based on
+  minutes studied that day. Reuses the existing /api/sessions/stats endpoint
+  (no new backend route needed) — same data source as the Dashboard's bar chart
+  and heatmap, just re-rendered as a calendar-aligned grid.
+
+Planner.jsx renamed from "Topic tracker" to "Planner" (nav labels updated in
+Sidebar + MobileNav too) since it now covers: calendar, revision due, and topics.

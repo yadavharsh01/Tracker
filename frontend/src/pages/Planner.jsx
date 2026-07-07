@@ -7,6 +7,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import TopicSection from "../components/planner/TopicSection";
 import AddTopicForm from "../components/planner/AddTopicForm";
 import RevisionDue from "../components/planner/RevisionDue";
+import MonthCalendar from "../components/planner/MonthCalendar";
 import {
   listTopics,
   seedTopics,
@@ -15,6 +16,7 @@ import {
   deleteTopic,
   getTopicsDue,
   markTopicRevised,
+  getSessionStats,
 } from "../lib/api";
 import { useToast } from "../context/ToastContext";
 
@@ -23,11 +25,25 @@ const SECTION_ORDER = ["QA", "VARC", "DILR"];
 export default function Planner() {
   const [topics, setTopics] = useState([]);
   const [dueTopics, setDueTopics] = useState([]);
+  const [dailyMinutes, setDailyMinutes] = useState(new Map());
   const [loading, setLoading] = useState(true);
   const [loadingDue, setLoadingDue] = useState(true);
+  const [loadingCalendar, setLoadingCalendar] = useState(true);
   const [adding, setAdding] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const { notify } = useToast();
+
+  const loadCalendar = useCallback(async () => {
+    setLoadingCalendar(true);
+    try {
+      const res = await getSessionStats();
+      setDailyMinutes(new Map(Object.entries(res.data)));
+    } catch {
+      notify("Couldn't load your calendar.", "error");
+    } finally {
+      setLoadingCalendar(false);
+    }
+  }, [notify]);
 
   const loadDue = useCallback(async () => {
     setLoadingDue(true);
@@ -63,7 +79,8 @@ export default function Planner() {
   useEffect(() => {
     load();
     loadDue();
-  }, [load, loadDue]);
+    loadCalendar();
+  }, [load, loadDue, loadCalendar]);
 
   const handleAdd = async (section, name) => {
     setAdding(true);
@@ -123,10 +140,14 @@ export default function Planner() {
       <Sidebar />
 
       <main className="flex-1 px-5 md:px-10 py-8 pb-24 md:pb-8 max-w-5xl mx-auto w-full">
-        <h1 className="font-display text-2xl font-semibold mb-2">Topic tracker</h1>
+        <h1 className="font-display text-2xl font-semibold mb-2">Planner</h1>
         <p className="text-sm text-ink-900/60 dark:text-paper-50/60 mb-6">
-          Tap a topic's status to cycle through not started → learning → mastered.
+          See your study calendar, catch up on due revisions, and track topic mastery.
         </p>
+
+        <div className="mb-6">
+          <MonthCalendar dailyMinutes={dailyMinutes} loading={loadingCalendar} />
+        </div>
 
         <Card className="mb-6">
           <AddTopicForm onAdd={handleAdd} submitting={adding} />
@@ -142,17 +163,20 @@ export default function Planner() {
             <Skeleton className="h-40 w-full" />
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            {grouped.map(({ section, items }) => (
-              <TopicSection
-                key={section}
-                section={section}
-                topics={items}
-                onMasteryChange={handleMasteryChange}
-                onDelete={setPendingDelete}
-              />
-            ))}
-          </div>
+          <>
+            <h2 className="font-display font-semibold text-lg mb-3">Topics</h2>
+            <div className="flex flex-col gap-6">
+              {grouped.map(({ section, items }) => (
+                <TopicSection
+                  key={section}
+                  section={section}
+                  topics={items}
+                  onMasteryChange={handleMasteryChange}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+            </div>
+          </>
         )}
       </main>
 

@@ -102,7 +102,7 @@ cat_track/
 | Dark/light mode | ✅ |
 | Mobile/tablet/desktop responsive | ✅ (incl. dedicated mobile nav) |
 | Toasts, loading skeletons, empty states, form validation | ✅ |
-| Daily/weekly/monthly *planner calendar views* | Partial — session history gives a week/month log; a true calendar grid view is a reasonable future addition |
+| Daily/weekly/monthly *planner calendar views* | ✅ Month calendar grid on the Planner page, color-coded by minutes studied, with prev/next navigation |
 | Achievement badges / milestones | ✅ 10 badges, computed live from existing data (streak, hours, mocks, mastered topics, level) |
 | Streak-risk reminder | ✅ Dashboard banner when today's session isn't logged yet |
 | Shareable progress card | ✅ Canvas-rendered downloadable PNG, no external dependency |
