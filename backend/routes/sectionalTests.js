@@ -45,6 +45,7 @@ router.get("/", auth, async (req, res) => {
     const tests = await SectionalTest.find(filter).sort({ date: -1 });
     res.json(tests);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -84,6 +85,7 @@ router.get("/analysis", auth, async (req, res) => {
 
     res.json(bySection);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -107,6 +109,7 @@ router.post("/", auth, async (req, res) => {
     await test.save();
     res.status(201).json(test);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -133,6 +136,7 @@ router.put("/:id", auth, async (req, res) => {
     if (!test) return res.status(404).json({ msg: "Sectional test not found" });
     res.json(test);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -144,6 +148,7 @@ router.delete("/:id", auth, async (req, res) => {
     if (!result) return res.status(404).json({ msg: "Sectional test not found" });
     res.json({ msg: "Sectional test deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });

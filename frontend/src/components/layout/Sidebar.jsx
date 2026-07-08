@@ -1,4 +1,4 @@
-import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, ListChecks, BookOpen } from "lucide-react";
+import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, ListChecks, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: "/mock-tests", label: "Mock tests", icon: ClipboardList },
   { to: "/sectional-tests", label: "Sectional scores", icon: ListChecks },
   { to: "/planner", label: "Planner", icon: BookOpen },
+  { to: "/colleges", label: "Colleges", icon: GraduationCap },
 ];
 
 export default function Sidebar() {
@@ -51,6 +52,17 @@ export default function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-1">
+        <Link
+          to="/settings"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+            location.pathname === "/settings"
+              ? "bg-ink-900/5 dark:bg-paper-50/8 text-ink-900 dark:text-paper-50"
+              : "text-ink-900/70 dark:text-paper-50/70 hover:bg-ink-900/5 dark:hover:bg-paper-50/8"
+          }`}
+        >
+          <SettingsIcon size={18} />
+          Settings
+        </Link>
         <button
           onClick={toggleTheme}
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-900/70 dark:text-paper-50/70 hover:bg-ink-900/5 dark:hover:bg-paper-50/8"

@@ -17,6 +17,7 @@ const mockTestSchema = new mongoose.Schema(
     date: { type: Date, default: Date.now },
     percentile: { type: Number, min: 0, max: 100 },
     totalScore: { type: Number, default: 0 },
+    notes: { type: String, default: "", trim: true },
     sections: {
       VARC: { type: sectionSchema, default: () => ({}) },
       DILR: { type: sectionSchema, default: () => ({}) },

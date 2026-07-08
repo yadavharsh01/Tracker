@@ -23,6 +23,7 @@ export default function MockTestForm({ initialData, onSubmit, onCancel, submitti
   );
   const [percentile, setPercentile] = useState(initialData?.percentile ?? "");
   const [totalScore, setTotalScore] = useState(initialData?.totalScore ?? "");
+  const [notes, setNotes] = useState(initialData?.notes || "");
   const [sections, setSections] = useState({
     VARC: toSectionState(initialData?.sections?.VARC),
     DILR: toSectionState(initialData?.sections?.DILR),
@@ -57,6 +58,7 @@ export default function MockTestForm({ initialData, onSubmit, onCancel, submitti
       date: date || undefined,
       percentile: percentile === "" ? undefined : Number(percentile),
       totalScore: totalScore === "" ? undefined : Number(totalScore),
+      notes: notes.trim(),
       sections: Object.fromEntries(
         SECTIONS.map((key) => [
           key,
@@ -119,6 +121,20 @@ export default function MockTestForm({ initialData, onSubmit, onCancel, submitti
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="mt-notes" className="text-sm font-medium text-ink-900/80 dark:text-paper-50/80">
+          Notes — what went wrong, what to review
+        </label>
+        <textarea
+          id="mt-notes"
+          rows={3}
+          placeholder="e.g. Ran out of time on DILR set 3, rushed the last 5 VARC questions..."
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="rounded-xl border border-ink-900/10 dark:border-paper-50/10 bg-paper-100 dark:bg-ink-900 px-3.5 py-2.5 text-sm resize-none"
+        />
       </div>
 
       {error && <p className="text-sm font-medium text-danger-500">{error}</p>}

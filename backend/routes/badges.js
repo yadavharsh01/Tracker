@@ -95,6 +95,7 @@ router.get("/", auth, async (req, res) => {
     const badges = buildBadges({ user, mockTestCount, topics });
     res.json(badges);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });

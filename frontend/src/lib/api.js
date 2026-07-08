@@ -34,12 +34,20 @@ export default api;
 // --- Auth ---
 export const signup = (data) => api.post("/auth/signup", data);
 export const login = (data) => api.post("/auth/login", data);
+export const forgotPassword = (email) => api.post("/auth/forgot-password", { email });
+export const resetPassword = (email, token, newPassword) =>
+  api.post("/auth/reset-password", { email, token, newPassword });
+export const changePassword = (currentPassword, newPassword) =>
+  api.put("/auth/change-password", { currentPassword, newPassword });
 
 // --- User ---
 export const getProfile = () => api.get("/user/profile");
 export const setExamDate = (examDate) => api.put("/user/exam-date", { examDate });
 export const setTargetPercentile = (targetPercentile) =>
   api.put("/user/target-percentile", { targetPercentile });
+export const updateProfile = (data) => api.put("/user/profile", data);
+export const deleteAccount = (password) => api.delete("/user/account", { data: { password } });
+export const exportData = () => api.get("/user/export");
 
 // --- Sessions ---
 export const addSession = (data) => api.post("/sessions/add", data);
@@ -80,3 +88,9 @@ export const listBadges = () => api.get("/badges");
 
 // --- AI Coach ---
 export const getInsights = () => api.get("/insights");
+
+// --- College Targets (WAT-PI tracker / shortlist) ---
+export const listColleges = () => api.get("/colleges");
+export const addCollege = (data) => api.post("/colleges", data);
+export const updateCollege = (id, data) => api.put(`/colleges/${id}`, data);
+export const deleteCollege = (id) => api.delete(`/colleges/${id}`);

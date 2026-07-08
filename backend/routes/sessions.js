@@ -68,6 +68,7 @@ router.post("/add", auth, async (req, res) => {
     res.json({ msg: "Session logged", session });
 
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -89,6 +90,7 @@ router.get("/stats", auth, async (req, res) => {
     res.json(daily);
 
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -109,6 +111,7 @@ router.get("/by-subject", auth, async (req, res) => {
 
     res.json(breakdown);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -129,6 +132,7 @@ router.get("/", auth, async (req, res) => {
     const sessions = await Session.find(filter).sort({ date: -1 });
     res.json(sessions);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });

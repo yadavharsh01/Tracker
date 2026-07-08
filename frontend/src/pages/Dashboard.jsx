@@ -17,6 +17,7 @@ import StreakRiskBanner from "../components/dashboard/StreakRiskBanner";
 import SessionHistory from "../components/dashboard/SessionHistory";
 import ShareCard from "../components/dashboard/ShareCard";
 import AICoach from "../components/dashboard/AICoach";
+import OnboardingModal, { shouldShowOnboarding } from "../components/dashboard/OnboardingModal";
 import { getProfile, getSessionStats, getTimeBySubject, listBadges, listSessions } from "../lib/api";
 import { useToast } from "../context/ToastContext";
 
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [loadingBadges, setLoadingBadges] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { notify } = useToast();
 
   const loadProfile = useCallback(async () => {
@@ -40,6 +42,7 @@ export default function Dashboard() {
     try {
       const res = await getProfile();
       setProfile(res.data);
+      if (shouldShowOnboarding(res.data)) setShowOnboarding(true);
     } catch {
       notify("Couldn't load your profile.", "error");
     } finally {
@@ -221,6 +224,17 @@ export default function Dashboard() {
       </main>
 
       <MobileNav />
+
+      {showOnboarding && (
+        <OnboardingModal
+          onComplete={(updates) => {
+            setShowOnboarding(false);
+            if (Object.keys(updates).length > 0) {
+              setProfile((prev) => ({ ...prev, ...updates }));
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

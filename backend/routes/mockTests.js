@@ -34,7 +34,7 @@ function withAccuracy(mockTest) {
 
 // CREATE
 router.post("/", auth, async (req, res) => {
-  const { name, date, percentile, totalScore, sections } = req.body;
+  const { name, date, percentile, totalScore, sections, notes } = req.body;
 
   if (!name || !name.trim()) {
     return res.status(400).json({ msg: "Mock test name is required" });
@@ -50,10 +50,12 @@ router.post("/", auth, async (req, res) => {
       percentile,
       totalScore,
       sections,
+      notes: notes?.trim() || "",
     });
     await mockTest.save();
     res.status(201).json(withAccuracy(mockTest));
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -64,13 +66,14 @@ router.get("/", auth, async (req, res) => {
     const mockTests = await MockTest.find({ userId: req.user.id }).sort({ date: -1 });
     res.json(mockTests.map(withAccuracy));
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
 
 // UPDATE
 router.put("/:id", auth, async (req, res) => {
-  const { name, date, percentile, totalScore, sections } = req.body;
+  const { name, date, percentile, totalScore, sections, notes } = req.body;
 
   const sectionError = validateSections(sections);
   if (sectionError) return res.status(400).json({ msg: sectionError });
@@ -83,6 +86,7 @@ router.put("/:id", auth, async (req, res) => {
     if (date !== undefined) mockTest.date = date;
     if (percentile !== undefined) mockTest.percentile = percentile;
     if (totalScore !== undefined) mockTest.totalScore = totalScore;
+    if (notes !== undefined) mockTest.notes = notes.trim();
     if (sections !== undefined) {
       mockTest.sections = { ...mockTest.sections.toObject(), ...sections };
     }
@@ -90,6 +94,7 @@ router.put("/:id", auth, async (req, res) => {
     await mockTest.save();
     res.json(withAccuracy(mockTest));
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -101,6 +106,7 @@ router.delete("/:id", auth, async (req, res) => {
     if (!result) return res.status(404).json({ msg: "Mock test not found" });
     res.json({ msg: "Mock test deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -148,6 +154,7 @@ router.get("/analysis", auth, async (req, res) => {
       strongestSection: sorted[sorted.length - 1] || null,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });

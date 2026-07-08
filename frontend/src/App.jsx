@@ -7,10 +7,14 @@ import PageTransition from "./components/layout/PageTransition";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import MockTests from "./pages/MockTests";
 import SectionalTests from "./pages/SectionalTests";
 import Planner from "./pages/Planner";
+import Colleges from "./pages/Colleges";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -24,6 +28,8 @@ export default function App() {
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                   path="/dashboard"
                   element={
@@ -53,6 +59,22 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <Planner />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/colleges"
+                  element={
+                    <ProtectedRoute>
+                      <Colleges />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
                     </ProtectedRoute>
                   }
                 />

@@ -13,7 +13,10 @@ const userSchema = new mongoose.Schema({
   level: { type: Number, default: 1 },
 
   examDate: { type: Date, default: null },
-  targetPercentile: { type: Number, default: null }
+  targetPercentile: { type: Number, default: null },
+
+  resetPasswordTokenHash: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null }
 });
 
 module.exports = mongoose.model("User", userSchema);

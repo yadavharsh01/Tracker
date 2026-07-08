@@ -26,6 +26,12 @@ Runs on `http://localhost:5000` by default (override with `PORT` in `.env`).
 `backend/.env` as `GEMINI_API_KEY=...`. Without it, the app works normally — the
 coach card just returns a friendly "not configured" message instead of advice.
 
+**To enable password reset emails:** add SMTP credentials to `backend/.env`
+(`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`). Without them,
+forgot-password still works in development — the reset link is logged to the
+server console and shown directly in the UI — but real emails won't send in
+production without SMTP configured.
+
 > Getting `EADDRINUSE: address already in use :::5000`? Something (usually a previous
 > run of this same server) is already holding the port.
 > **Windows:** `netstat -ano | findstr :5000` then `taskkill /PID <pid> /F`
@@ -100,6 +106,13 @@ cat_track/
 | Dashboard (streak, days left, XP/level) | ✅ |
 | Mock tests: add/edit/delete, sectional accuracy | ✅ |
 | Sectional scores (single-section practice tests) | ✅ Separate tab, VARC/DILR/QA tracked independently with their own trend charts and best-score/accuracy summaries |
+| Account settings (change password, update profile) | ✅ |
+| Forgot/reset password | ✅ Works without email configured (dev mode shows the link directly); production needs SMTP env vars |
+| Delete account | ✅ Password-confirmed, cascades to all owned data (sessions, mocks, sectionals, topics, goals, colleges) |
+| Export your data | ✅ One-click JSON download of everything you've logged |
+| WAT-PI tracker / college shortlist | ✅ Track target B-schools, status (targeting/shortlisted/WAT-PI scheduled/selected/etc.), WAT-PI countdown, notes |
+| Mock test reflection notes | ✅ Free-text "what went wrong" field per mock test |
+| Onboarding flow | ✅ First-login modal to set exam date + target percentile (skippable, never re-shown once dismissed) |
 | Section tracking (QA/VARC/DILR) | ✅ |
 | Topic tracker with mastery levels | ✅ |
 | Daily/weekly/monthly study goals | ✅ |

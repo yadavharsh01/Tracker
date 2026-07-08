@@ -46,6 +46,7 @@ router.post("/", auth, async (req, res) => {
     );
     res.json(goal);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -72,6 +73,7 @@ router.get("/", auth, async (req, res) => {
 
     res.json(progress);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });

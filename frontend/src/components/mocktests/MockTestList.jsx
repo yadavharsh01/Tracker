@@ -30,39 +30,47 @@ export default function MockTestList({ mockTests, onEdit, onDelete }) {
   return (
     <div className="flex flex-col gap-3">
       {mockTests.map((mt) => (
-        <Card key={mt._id} className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-display font-semibold text-sm">{mt.name}</h4>
-              <span className="text-xs text-ink-900/45 dark:text-paper-50/45">
-                {new Date(mt.date).toLocaleDateString()}
-              </span>
+        <Card key={mt._id} className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="font-display font-semibold text-sm">{mt.name}</h4>
+                <span className="text-xs text-ink-900/45 dark:text-paper-50/45">
+                  {new Date(mt.date).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                {SECTIONS.map((key) => (
+                  <SectionBadge key={key} label={key} accuracy={mt.sections?.[key]?.accuracy ?? 0} />
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap mt-2">
-              {SECTIONS.map((key) => (
-                <SectionBadge key={key} label={key} accuracy={mt.sections?.[key]?.accuracy ?? 0} />
-              ))}
+
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="tabular text-lg font-semibold">{mt.totalScore ?? "—"}</p>
+                {mt.percentile !== undefined && mt.percentile !== null && (
+                  <p className="tabular text-xs text-ink-900/50 dark:text-paper-50/50">
+                    {mt.percentile}%ile
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" className="p-2" onClick={() => onEdit(mt)} aria-label="Edit mock test">
+                  <Pencil size={16} />
+                </Button>
+                <Button variant="ghost" className="p-2 text-danger-500" onClick={() => onDelete(mt)} aria-label="Delete mock test">
+                  <Trash2 size={16} />
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="tabular text-lg font-semibold">{mt.totalScore ?? "—"}</p>
-              {mt.percentile !== undefined && mt.percentile !== null && (
-                <p className="tabular text-xs text-ink-900/50 dark:text-paper-50/50">
-                  {mt.percentile}%ile
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" className="p-2" onClick={() => onEdit(mt)} aria-label="Edit mock test">
-                <Pencil size={16} />
-              </Button>
-              <Button variant="ghost" className="p-2 text-danger-500" onClick={() => onDelete(mt)} aria-label="Delete mock test">
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          </div>
+          {mt.notes && (
+            <p className="text-sm text-ink-900/70 dark:text-paper-50/70 whitespace-pre-line border-t border-ink-900/8 dark:border-paper-50/8 pt-3">
+              {mt.notes}
+            </p>
+          )}
         </Card>
       ))}
     </div>

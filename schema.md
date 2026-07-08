@@ -146,3 +146,45 @@ frontend/src/
 
 Nav updated in Sidebar + MobileNav (mobile bar now holds 6 items — labels shortened
 to fit: "Home" instead of "Dashboard", "Sections" instead of "Sectional scores").
+
+## Round 7 — account gaps, WAT-PI tracker, quality-of-life (huge batch)
+
+### Account / auth
+backend/routes/auth.js    + forgot-password, reset-password, change-password
+                           (crypto-based reset tokens, hashed before storage;
+                           email optional via nodemailer, degrades to console
+                           log + UI display in dev if SMTP unset)
+backend/routes/user.js    + PUT /profile, DELETE /account (password-confirmed,
+                           cascades to Session/MockTest/SectionalTest/Topic/
+                           Goal/CollegeTarget), GET /export (full JSON dump)
+backend/models/User.js    + resetPasswordTokenHash, resetPasswordExpires
+
+frontend/src/pages/
+  ForgotPassword.jsx, ResetPassword.jsx, Settings.jsx (profile/password/
+  export/danger-zone sections)
+
+### WAT-PI tracker / college shortlist
+backend/models/CollegeTarget.js   collegeName, status (6-state), cutoffPercentile,
+                                    watPiDate, notes
+backend/routes/collegeTargets.js  CRUD
+frontend/src/
+  components/colleges/  CollegeForm, CollegeCard (status badges, WAT-PI countdown)
+  pages/Colleges.jsx    registered at /colleges
+
+### Quality of life
+- MockTest.notes field (reflection/what-went-wrong), form + list updated
+- Onboarding modal (components/dashboard/OnboardingModal.jsx) — shown once on
+  first dashboard visit if examDate+targetPercentile both unset, dismissible,
+  tracked via localStorage so it never nags twice
+
+### Navigation restructure
+MobileNav now has 4 primary tabs (Home/Mocks/Sections/Planner) + a "More" bottom
+sheet (Colleges, Settings, theme, logout) instead of cramming 8 items into one bar.
+Sidebar gained Colleges (main nav) and Settings (bottom, near theme/logout).
+
+### Real bug found and fixed: silent error logging
+Audited every route file — 34 catch blocks across 8 files (`user.js`, `badges.js`,
+`collegeTargets.js`, `goals.js`, `mockTests.js`, `sectionalTests.js`, `sessions.js`,
+`topics.js`) caught errors but never logged them, meaning production failures would
+be completely silent server-side. Fixed with a scripted pass adding console.error(err)
+to every catch block missing it.

@@ -48,6 +48,7 @@ app.use("/api/sessions", require("./routes/sessions"));
 app.use("/api/user", require("./routes/user"));
 app.use("/api/mocktests", require("./routes/mockTests"));
 app.use("/api/sectionaltests", require("./routes/sectionalTests"));
+app.use("/api/colleges", require("./routes/collegeTargets"));
 app.use("/api/goals", require("./routes/goals"));
 app.use("/api/topics", require("./routes/topics"));
 app.use("/api/badges", require("./routes/badges"));

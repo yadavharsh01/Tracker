@@ -37,6 +37,7 @@ router.post("/seed", auth, async (req, res) => {
     const topics = await Topic.find({ userId: req.user.id }).sort({ section: 1, name: 1 });
     res.json(topics);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -47,6 +48,7 @@ router.get("/", auth, async (req, res) => {
     const topics = await Topic.find({ userId: req.user.id }).sort({ section: 1, name: 1 });
     res.json(topics);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -74,6 +76,7 @@ router.get("/due", auth, async (req, res) => {
 
     res.json(due);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -94,6 +97,7 @@ router.post("/", auth, async (req, res) => {
     await topic.save();
     res.status(201).json(topic);
   } catch (err) {
+    console.error(err);
     if (err.code === 11000) {
       return res.status(400).json({ msg: "You already have a topic with this name in this section" });
     }
@@ -126,6 +130,7 @@ router.put("/:id", auth, async (req, res) => {
     if (!topic) return res.status(404).json({ msg: "Topic not found" });
     res.json(topic);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -141,6 +146,7 @@ router.put("/:id/revise", auth, async (req, res) => {
     if (!topic) return res.status(404).json({ msg: "Topic not found" });
     res.json(topic);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -152,6 +158,7 @@ router.delete("/:id", auth, async (req, res) => {
     if (!result) return res.status(404).json({ msg: "Topic not found" });
     res.json({ msg: "Topic deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 });
