@@ -16,6 +16,7 @@ import BadgesWidget from "../components/badges/BadgesWidget";
 import StreakRiskBanner from "../components/dashboard/StreakRiskBanner";
 import SessionHistory from "../components/dashboard/SessionHistory";
 import ShareCard from "../components/dashboard/ShareCard";
+import AICoach from "../components/dashboard/AICoach";
 import { getProfile, getSessionStats, getTimeBySubject, listBadges, listSessions } from "../lib/api";
 import { useToast } from "../context/ToastContext";
 
@@ -202,13 +203,14 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex flex-col gap-6">
             <SessionHistory
               sessions={historySessions}
               loading={loadingHistory}
               range={historyRange}
               onRangeChange={handleRangeChange}
             />
+            <AICoach />
           </div>
           <ShareCard
             streak={profile?.streak ?? 0}

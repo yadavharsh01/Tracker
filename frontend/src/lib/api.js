@@ -54,6 +54,14 @@ export const updateMockTest = (id, data) => api.put(`/mocktests/${id}`, data);
 export const deleteMockTest = (id) => api.delete(`/mocktests/${id}`);
 export const getMockTestAnalysis = () => api.get("/mocktests/analysis");
 
+// --- Sectional Tests (single-section practice, distinct from full mocks) ---
+export const listSectionalTests = (section) =>
+  api.get("/sectionaltests", { params: section ? { section } : {} });
+export const createSectionalTest = (data) => api.post("/sectionaltests", data);
+export const updateSectionalTest = (id, data) => api.put(`/sectionaltests/${id}`, data);
+export const deleteSectionalTest = (id) => api.delete(`/sectionaltests/${id}`);
+export const getSectionalAnalysis = () => api.get("/sectionaltests/analysis");
+
 // --- Goals ---
 export const listGoalProgress = () => api.get("/goals");
 export const setGoal = (period, targetMinutes) => api.post("/goals", { period, targetMinutes });
@@ -69,3 +77,6 @@ export const markTopicRevised = (id) => api.put(`/topics/${id}/revise`);
 
 // --- Badges ---
 export const listBadges = () => api.get("/badges");
+
+// --- AI Coach ---
+export const getInsights = () => api.get("/insights");

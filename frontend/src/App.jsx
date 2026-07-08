@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import MockTests from "./pages/MockTests";
+import SectionalTests from "./pages/SectionalTests";
 import Planner from "./pages/Planner";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <MockTests />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/sectional-tests"
+                  element={
+                    <ProtectedRoute>
+                      <SectionalTests />
                     </ProtectedRoute>
                   }
                 />

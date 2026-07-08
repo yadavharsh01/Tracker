@@ -1,22 +1,25 @@
 # Deploying CAT Prep Tracker
 
-Three pieces to deploy: database (MongoDB Atlas — you likely already have this),
-backend (Render), frontend (Vercel). All have free tiers sufficient to launch.
+Three pieces to deploy: database (MongoDB Atlas), backend (Render), frontend (Vercel).
+All have free tiers sufficient to launch.
 
-## 0. Push to GitHub
+## 0. Get dependencies current, then push to GitHub
 
-**First, generate the frontend lockfile locally** (it doesn't exist yet since this was
-built without network access): run `npm install` in `frontend/` once — this creates
+**Backend:** two security dependencies (`helmet`, `express-rate-limit`) were added to
+`backend/package.json` but not yet installed locally. Run `npm install` in `backend/`
+once to pull them in before your next local run or push.
+
+**Frontend:** if you haven't already, run `npm install` in `frontend/` — this creates
 `frontend/package-lock.json`, which should be committed. Locked versions mean Render
 and Vercel install exactly what you tested, not whatever's newest on the day they build.
 
-If this isn't already a GitHub repo:
+If this isn't already a GitHub repo (check with `git status` inside `cat_track/` — it
+likely already is, with a couple of commits):
 
 ```bash
 cd cat_track
-git init
-git add .
-git commit -m "Initial commit"
+git add -A
+git commit -m "Pre-deploy: security middleware, latest features"
 ```
 
 Create a new repo on GitHub, then:
@@ -29,9 +32,9 @@ git push -u origin main
 
 Double-check `.gitignore` excludes `node_modules/`, `.env`, and `dist/` before pushing —
 this project's `.gitignore` already does, but confirm `backend/.env` never got committed
-in an earlier commit. If it did: rotate your `JWT_SECRET` and Atlas password immediately,
-then remove it from history (`git filter-repo` or BFG Repo-Cleaner) before making the
-repo public.
+in an earlier commit (`git log --all --full-history -- backend/.env` should show nothing).
+If it did: rotate your `JWT_SECRET` and Atlas password immediately, then remove it from
+history (`git filter-repo` or BFG Repo-Cleaner) before making the repo public.
 
 ## 1. Database — MongoDB Atlas
 
@@ -51,7 +54,11 @@ If you don't already have a cluster:
 5. **Environment variables** (Render dashboard → Environment):
    - `MONGO_URI` — from step 1
    - `JWT_SECRET` — any long random string (e.g. generate with `openssl rand -hex 32`)
+   - `NODE_ENV` — `production` (hides internal error details from API responses)
    - `FRONTEND_URL` — leave blank for now, you'll fill this in after step 3
+   - `GEMINI_API_KEY` — optional, only if you want the AI coach live. Get one free at
+     [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Skip it and the
+     app works fine without that one feature.
 6. Deploy. Note the URL Render gives you, e.g. `https://cat-tracker-api.onrender.com`
 
 > Free tier spins down after ~15 minutes of inactivity — the first request after that
@@ -76,13 +83,22 @@ Redeploy the backend (Render redeploys automatically on env var changes, or trig
 manually). This restricts the API to only accept requests from your deployed frontend
 instead of any origin.
 
-## 5. Verify
+## 5. Verify — full click-through checklist
 
-- Visit your Vercel URL, sign up, log in, log a session, add a mock test
-- Check Render's logs if anything 500s — `console.error` in the error handler will show
-  the real error there
-- If login/signup calls fail with a CORS error in the browser console, double-check
-  `FRONTEND_URL` on Render exactly matches your Vercel URL (protocol, no trailing slash)
+- [ ] Visit your Vercel URL — landing page loads, dark/light toggle works
+- [ ] Sign up with a new account
+- [ ] Log in
+- [ ] Log a study session — dashboard stats update
+- [ ] Add a mock test — trend chart and weak/strong section cards populate
+- [ ] Visit Planner — calendar shows today, add a topic, cycle its mastery
+- [ ] Check a badge unlocks after logging your first session
+- [ ] Try the AI coach button (if `GEMINI_API_KEY` is set) — or confirm it shows the
+      "not configured" message cleanly (if not set)
+- [ ] Open on your phone — bottom nav bar appears, everything's reachable
+- [ ] Log out, confirm you're redirected and can't reach `/dashboard` directly
+
+If anything 500s, check Render's logs — with `NODE_ENV=production` set, API responses
+won't show the real error, but Render's log output still will.
 
 ## Ongoing
 
@@ -91,3 +107,6 @@ instead of any origin.
   the domain itself, e.g. via Namecheap/Google Domains)
 - Watch Atlas's free-tier storage limit (512MB) as your user base grows — that's plenty
   for thousands of users' session/mock-test/topic records given how small each document is
+- Rate limiting is currently in-memory (resets on redeploy/restart) — fine at this
+  scale; if you ever run multiple backend instances behind a load balancer, you'd want
+  a shared store (e.g. Redis) instead

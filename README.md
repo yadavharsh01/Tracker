@@ -21,6 +21,11 @@ npm run dev
 
 Runs on `http://localhost:5000` by default (override with `PORT` in `.env`).
 
+**To enable the AI weak-area coach:** get a free key at
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey) and add it to
+`backend/.env` as `GEMINI_API_KEY=...`. Without it, the app works normally — the
+coach card just returns a friendly "not configured" message instead of advice.
+
 > Getting `EADDRINUSE: address already in use :::5000`? Something (usually a previous
 > run of this same server) is already holding the port.
 > **Windows:** `netstat -ano | findstr :5000` then `taskkill /PID <pid> /F`
@@ -94,6 +99,7 @@ cat_track/
 |---|---|
 | Dashboard (streak, days left, XP/level) | ✅ |
 | Mock tests: add/edit/delete, sectional accuracy | ✅ |
+| Sectional scores (single-section practice tests) | ✅ Separate tab, VARC/DILR/QA tracked independently with their own trend charts and best-score/accuracy summaries |
 | Section tracking (QA/VARC/DILR) | ✅ |
 | Topic tracker with mastery levels | ✅ |
 | Daily/weekly/monthly study goals | ✅ |
@@ -109,7 +115,7 @@ cat_track/
 | Percentile target tracker | ✅ Set a target, see live gap vs. latest mock percentile |
 | Session history / planner view | ✅ Week/month/all-time session log on the dashboard |
 | Revision planner | ✅ Topics flagged "due" after 14 days unrevised, one-tap "mark revised" |
-| AI weak-area coach | Not built — needs your own LLM API key, skipped by choice; can be added anytime |
+| AI weak-area coach | ✅ Uses Google AI Studio (Gemini). Optional — needs `GEMINI_API_KEY` in `.env`; app works fine without it |
 
 ## Known limitations / honest notes
 

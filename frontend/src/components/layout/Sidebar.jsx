@@ -1,4 +1,4 @@
-import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, BookOpen } from "lucide-react";
+import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, ListChecks, BookOpen } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/mock-tests", label: "Mock tests", icon: ClipboardList },
+  { to: "/sectional-tests", label: "Sectional scores", icon: ListChecks },
   { to: "/planner", label: "Planner", icon: BookOpen },
 ];
 

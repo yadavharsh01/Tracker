@@ -114,3 +114,35 @@ frontend/src/components/planner/MonthCalendar.jsx
 
 Planner.jsx renamed from "Topic tracker" to "Planner" (nav labels updated in
 Sidebar + MobileNav too) since it now covers: calendar, revision due, and topics.
+
+## Round 5 — AI weak-area coach
+
+backend/routes/insights.js
+  GET / — gathers section accuracy (from MockTest), unmastered topics (from Topic),
+  streak + exam countdown (from User), builds a prompt, calls Google AI Studio's
+  Gemini API (model configurable via GEMINI_MODEL, default gemini-2.0-flash).
+  Requires GEMINI_API_KEY in .env — returns a clear 503 message if unset rather
+  than a generic error. Includes a 60s per-user in-memory cooldown to prevent
+  accidental repeated billed calls.
+
+frontend/src/components/dashboard/AICoach.jsx
+  On-demand "Get advice" button on the dashboard. No auto-fetch on page load —
+  this one costs money per call, so it only runs when the user explicitly asks.
+
+## Round 6 — sectional scores (separate from full mock tests)
+
+backend/
+├── models/SectionalTest.js   userId, section (VARC/DILR/QA), testName, date,
+│                              questionsAttempted, correct, timeTaken, score
+└── routes/sectionalTests.js  CRUD (?section= filter on list) + /analysis
+                               (per-section trend, best score, overall accuracy)
+
+frontend/src/
+├── components/sectionaltests/
+│   ├── SectionalTestForm.jsx   single-section entry (not 3 sections like mock tests)
+│   ├── SectionalTestList.jsx
+│   └── SectionTrendChart.jsx   score + accuracy trend for the active section tab
+└── pages/SectionalTests.jsx    registered at /sectional-tests, tabbed by section
+
+Nav updated in Sidebar + MobileNav (mobile bar now holds 6 items — labels shortened
+to fit: "Home" instead of "Dashboard", "Sections" instead of "Sectional scores").
