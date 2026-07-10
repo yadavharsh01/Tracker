@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -6,7 +6,9 @@ import {
   BookOpen,
   MoreHorizontal,
   GraduationCap,
+  Trophy,
   Settings as SettingsIcon,
+  ShieldCheck,
   Moon,
   Sun,
   LogOut,
@@ -15,6 +17,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
+import { getProfile } from "../../lib/api";
 
 const PRIMARY_ITEMS = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -25,6 +28,7 @@ const PRIMARY_ITEMS = [
 
 const MORE_LINKS = [
   { to: "/colleges", label: "Colleges", icon: GraduationCap },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
@@ -34,13 +38,24 @@ export default function MobileNav() {
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    getProfile()
+      .then((res) => setIsAdmin(Boolean(res.data.isAdmin)))
+      .catch(() => {});
+  }, []);
+
+  const moreLinks = isAdmin
+    ? [{ to: "/admin/users", label: "Admin", icon: ShieldCheck }, ...MORE_LINKS]
+    : MORE_LINKS;
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  const isMoreActive = MORE_LINKS.some((l) => l.to === location.pathname);
+  const isMoreActive = moreLinks.some((l) => location.pathname.startsWith(l.to));
 
   return (
     <>
@@ -95,7 +110,7 @@ export default function MobileNav() {
             </div>
 
             <div className="flex flex-col gap-1">
-              {MORE_LINKS.map(({ to, label, icon: Icon }) => (
+              {moreLinks.map(({ to, label, icon: Icon }) => (
                 <Link
                   key={to}
                   to={to}

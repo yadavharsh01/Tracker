@@ -76,6 +76,18 @@ export default function Login() {
           </Button>
         </form>
 
+        <div className="flex items-center gap-3 my-5">
+          <div className="flex-1 h-px bg-ink-900/8 dark:bg-paper-50/10" />
+          <span className="text-xs text-ink-900/40 dark:text-paper-50/40">or</span>
+          <div className="flex-1 h-px bg-ink-900/8 dark:bg-paper-50/10" />
+        </div>
+
+        <Link to="/otp-login">
+          <Button variant="secondary" className="w-full">
+            Log in with a code instead
+          </Button>
+        </Link>
+
         <p className="text-sm text-center text-ink-900/60 dark:text-paper-50/60 mt-6">
           New here?{" "}
           <Link to="/signup" className="font-medium text-amber-500 hover:underline">

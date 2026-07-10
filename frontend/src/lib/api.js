@@ -39,6 +39,8 @@ export const resetPassword = (email, token, newPassword) =>
   api.post("/auth/reset-password", { email, token, newPassword });
 export const changePassword = (currentPassword, newPassword) =>
   api.put("/auth/change-password", { currentPassword, newPassword });
+export const requestOtp = (identifier) => api.post("/auth/otp/request", { identifier });
+export const verifyOtp = (identifier, otp) => api.post("/auth/otp/verify", { identifier, otp });
 
 // --- User ---
 export const getProfile = () => api.get("/user/profile");
@@ -94,3 +96,19 @@ export const listColleges = () => api.get("/colleges");
 export const addCollege = (data) => api.post("/colleges", data);
 export const updateCollege = (id, data) => api.put(`/colleges/${id}`, data);
 export const deleteCollege = (id) => api.delete(`/colleges/${id}`);
+
+// --- Admin ---
+export const adminListUsers = () => api.get("/admin/users");
+export const adminGetUser = (id) => api.get(`/admin/users/${id}`);
+export const adminGetUserLogins = (id) => api.get(`/admin/users/${id}/logins`);
+export const adminGetAllLogins = () => api.get("/admin/logins");
+
+// --- Push notifications ---
+export const getPushPublicKey = () => api.get("/push/public-key");
+export const subscribePush = (subscription) => api.post("/push/subscribe", subscription);
+export const unsubscribePush = (endpoint) => api.post("/push/unsubscribe", { endpoint });
+export const testPush = () => api.post("/push/test");
+
+// --- Leaderboard ---
+export const getLeaderboard = () => api.get("/leaderboard");
+export const setLeaderboardOptIn = (optIn) => api.put("/user/leaderboard-opt-in", { optIn });

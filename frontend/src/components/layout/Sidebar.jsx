@@ -1,7 +1,9 @@
-import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, ListChecks, BookOpen, Settings as SettingsIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LayoutDashboard, LogOut, Moon, Sun, GraduationCap, ClipboardList, ListChecks, BookOpen, Settings as SettingsIcon, ShieldCheck, Trophy } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { getProfile } from "../../lib/api";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -9,6 +11,7 @@ const NAV_ITEMS = [
   { to: "/sectional-tests", label: "Sectional scores", icon: ListChecks },
   { to: "/planner", label: "Planner", icon: BookOpen },
   { to: "/colleges", label: "Colleges", icon: GraduationCap },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 export default function Sidebar() {
@@ -16,6 +19,13 @@ export default function Sidebar() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    getProfile()
+      .then((res) => setIsAdmin(Boolean(res.data.isAdmin)))
+      .catch(() => {});
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -52,6 +62,19 @@ export default function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-1">
+        {isAdmin && (
+          <Link
+            to="/admin/users"
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+              location.pathname.startsWith("/admin")
+                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                : "text-amber-600 dark:text-amber-400 hover:bg-amber-500/8"
+            }`}
+          >
+            <ShieldCheck size={18} />
+            Admin
+          </Link>
+        )}
         <Link
           to="/settings"
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${

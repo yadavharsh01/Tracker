@@ -26,11 +26,32 @@ Runs on `http://localhost:5000` by default (override with `PORT` in `.env`).
 `backend/.env` as `GEMINI_API_KEY=...`. Without it, the app works normally — the
 coach card just returns a friendly "not configured" message instead of advice.
 
-**To enable password reset emails:** add SMTP credentials to `backend/.env`
-(`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`). Without them,
-forgot-password still works in development — the reset link is logged to the
-server console and shown directly in the UI — but real emails won't send in
-production without SMTP configured.
+**Password reset now requires SMTP** — forgot-password returns a clear error until
+`SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` are set in `backend/.env` (see the comments
+there for a step-by-step Gmail App Password setup, the easiest free option). The
+reset link is only ever emailed — it's never shown in the UI or API response.
+
+**OTP login** ("log in with a code" on the login page) works the same way — the
+code is only ever sent to the email/phone, never shown in the app. Email codes
+reuse the SMTP config above. Phone codes need Twilio: set `TWILIO_ACCOUNT_SID`,
+`TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` in `backend/.env` (free trial credits
+at twilio.com/try-twilio). Users add their phone number from Settings before
+phone-based OTP login will work for their account.
+
+**Push notifications** need a VAPID key pair — generate one locally with
+`npx web-push generate-vapid-keys` and add the two keys to `backend/.env` as
+`VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`. Once set, users can turn on
+notifications from Settings and get a push if they haven't logged a study
+session by 8 PM (server time) and have an active streak to protect. Without
+VAPID keys, the Settings card just shows a clear "not configured" message —
+nothing else in the app is affected.
+
+**To make yourself an admin:** add your email to `ADMIN_EMAILS` in `backend/.env`
+(comma-separated for multiple admins), then log out and back in — admin access is
+granted automatically on your next login. Admins get an "Admin" link in the nav
+showing every user's summary stats, a read-only view of any individual user's
+dashboard (streak, level, charts, mock/sectional test counts), and login history
+per-user or as a global feed.
 
 > Getting `EADDRINUSE: address already in use :::5000`? Something (usually a previous
 > run of this same server) is already holding the port.
@@ -107,7 +128,12 @@ cat_track/
 | Mock tests: add/edit/delete, sectional accuracy | ✅ |
 | Sectional scores (single-section practice tests) | ✅ Separate tab, VARC/DILR/QA tracked independently with their own trend charts and best-score/accuracy summaries |
 | Account settings (change password, update profile) | ✅ |
-| Forgot/reset password | ✅ Works without email configured (dev mode shows the link directly); production needs SMTP env vars |
+| Forgot/reset password | ✅ Email-only — SMTP is required (returns a clear error if unconfigured, never shows the link in-app) |
+| OTP login (email or phone) | ✅ 6-digit code, 10-min expiry, 60s resend cooldown. Email reuses SMTP config; phone needs Twilio |
+| Push notifications | ✅ Real browser push (not just in-app banner) — daily streak-risk reminder + test button in Settings. Needs VAPID keys |
+| Friend/social leaderboard | ✅ Opt-in, ranked by streak then hours. Global (not friends-only) — a true friends system would be a bigger future addition |
+| Admin panel | ✅ User list, per-user dashboard view (streak/level/charts/mock&sectional counts), login history — auto-granted via `ADMIN_EMAILS` env var |
+| Login history tracking | ✅ Every login recorded (timestamp, IP, user agent), visible per-user and as a global feed to admins |
 | Delete account | ✅ Password-confirmed, cascades to all owned data (sessions, mocks, sectionals, topics, goals, colleges) |
 | Export your data | ✅ One-click JSON download of everything you've logged |
 | WAT-PI tracker / college shortlist | ✅ Track target B-schools, status (targeting/shortlisted/WAT-PI scheduled/selected/etc.), WAT-PI countdown, notes |

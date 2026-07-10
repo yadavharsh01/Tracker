@@ -17,13 +17,16 @@ router.get("/profile", auth, async (req, res) => {
     res.json({
       name: user.name,
       email: user.email,
+      phone: user.phone,
+      isAdmin: user.isAdmin,
       totalHours: user.totalHours,
       streak: user.streak,
       lastActiveDate: user.lastActiveDate,
       xp: user.xp,
       level: user.level,
       examDate: user.examDate,
-      targetPercentile: user.targetPercentile
+      targetPercentile: user.targetPercentile,
+      leaderboardOptIn: user.leaderboardOptIn
     });
 
   } catch (err) {
@@ -77,7 +80,7 @@ router.put("/target-percentile", auth, async (req, res) => {
 
 // UPDATE PROFILE (name and/or email)
 router.put("/profile", auth, async (req, res) => {
-  const { name, email } = req.body;
+  const { name, email, phone } = req.body;
 
   if (name !== undefined && !name.trim()) {
     return res.status(400).json({ msg: "Name can't be empty" });
@@ -85,19 +88,27 @@ router.put("/profile", auth, async (req, res) => {
   if (email !== undefined && !/^\S+@\S+\.\S+$/.test(email)) {
     return res.status(400).json({ msg: "A valid email is required" });
   }
+  if (phone !== undefined && phone !== "" && phone !== null && !/^\+?[1-9]\d{7,14}$/.test(phone.replace(/[\s-]/g, ""))) {
+    return res.status(400).json({ msg: "Enter a valid phone number, e.g. +919876543210" });
+  }
 
   try {
     if (email !== undefined) {
       const existing = await User.findOne({ email, _id: { $ne: req.user.id } });
       if (existing) return res.status(400).json({ msg: "That email is already in use" });
     }
+    if (phone) {
+      const existingPhone = await User.findOne({ phone, _id: { $ne: req.user.id } });
+      if (existingPhone) return res.status(400).json({ msg: "That phone number is already in use" });
+    }
 
     const update = {};
     if (name !== undefined) update.name = name.trim();
     if (email !== undefined) update.email = email;
+    if (phone !== undefined) update.phone = phone || null;
 
     const user = await User.findByIdAndUpdate(req.user.id, update, { new: true });
-    res.json({ name: user.name, email: user.email });
+    res.json({ name: user.name, email: user.email, phone: user.phone });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
@@ -162,6 +173,26 @@ router.get("/export", auth, async (req, res) => {
       goals,
       collegeTargets: colleges,
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// LEADERBOARD OPT-IN TOGGLE
+router.put("/leaderboard-opt-in", auth, async (req, res) => {
+  const { optIn } = req.body;
+  if (typeof optIn !== "boolean") {
+    return res.status(400).json({ msg: "optIn must be true or false" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { leaderboardOptIn: optIn },
+      { new: true }
+    );
+    res.json({ leaderboardOptIn: user.leaderboardOptIn });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });

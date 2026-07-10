@@ -15,6 +15,14 @@ export function AuthProvider({ children }) {
     return res.data;
   }, []);
 
+  const loginWithOtp = useCallback(async (identifier, otp) => {
+    const res = await authApi.verifyOtp(identifier, otp);
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user || null);
+    return res.data;
+  }, []);
+
   const signup = useCallback(async (name, email, password) => {
     const res = await authApi.signup({ name, email, password });
     return res.data;
@@ -31,6 +39,7 @@ export function AuthProvider({ children }) {
     user,
     isAuthenticated: Boolean(token),
     login,
+    loginWithOtp,
     signup,
     logout,
   };

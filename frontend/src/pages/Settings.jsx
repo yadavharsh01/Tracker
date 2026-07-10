@@ -7,6 +7,8 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import PushNotifications from "../components/settings/PushNotifications";
+import LeaderboardOptIn from "../components/settings/LeaderboardOptIn";
 import {
   getProfile,
   updateProfile,
@@ -18,6 +20,7 @@ import {
 function ProfileSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { notify } = useToast();
@@ -27,6 +30,7 @@ function ProfileSection() {
       .then((res) => {
         setName(res.data.name || "");
         setEmail(res.data.email || "");
+        setPhone(res.data.phone || "");
       })
       .catch(() => notify("Couldn't load your profile.", "error"))
       .finally(() => setLoading(false));
@@ -37,7 +41,7 @@ function ProfileSection() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await updateProfile({ name, email });
+      await updateProfile({ name, email, phone: phone || null });
       notify("Profile updated.");
     } catch (err) {
       notify(err.response?.data?.msg || "Couldn't update your profile.", "error");
@@ -63,6 +67,13 @@ function ProfileSection() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            id="settings-phone"
+            label="Phone (optional — enables code login by SMS)"
+            placeholder="+919876543210"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <Button type="submit" loading={submitting} className="self-start">
             Save changes
@@ -267,6 +278,8 @@ export default function Settings() {
         <div className="flex flex-col gap-6">
           <ProfileSection />
           <PasswordSection />
+          <PushNotifications />
+          <LeaderboardOptIn />
           <ExportSection />
           <DangerZone />
         </div>

@@ -10,7 +10,6 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
-  const [devResetUrl, setDevResetUrl] = useState(null);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -22,11 +21,8 @@ export default function ForgotPassword() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await forgotPassword(email);
+      await forgotPassword(email);
       setSent(true);
-      // Only present when the backend is running outside production (no SMTP
-      // required for local/dev use) — see backend/routes/auth.js.
-      if (res.data.devResetUrl) setDevResetUrl(res.data.devResetUrl);
     } catch (err) {
       setError(err.response?.data?.msg || "Something went wrong. Try again.");
     } finally {
@@ -49,18 +45,9 @@ export default function ForgotPassword() {
           <div className="flex flex-col items-center gap-3 text-center py-4">
             <Mail className="text-teal-500" size={28} />
             <p className="text-sm text-ink-900/80 dark:text-paper-50/80">
-              If that email is registered, a reset link is on its way.
+              If that email is registered, a reset link is on its way. Check your inbox
+              (and spam folder) — it expires in 1 hour.
             </p>
-            {devResetUrl && (
-              <div className="w-full mt-2 rounded-xl bg-amber-500/8 border border-amber-500/20 p-3 text-left">
-                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 mb-1">
-                  Dev mode — SMTP not configured, link shown here instead:
-                </p>
-                <a href={devResetUrl} className="text-xs break-all underline text-ink-900/70 dark:text-paper-50/70">
-                  {devResetUrl}
-                </a>
-              </div>
-            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

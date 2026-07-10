@@ -188,3 +188,127 @@ Audited every route file — 34 catch blocks across 8 files (`user.js`, `badges.
 `topics.js`) caught errors but never logged them, meaning production failures would
 be completely silent server-side. Fixed with a scripted pass adding console.error(err)
 to every catch block missing it.
+
+## Round 8 — SMTP hardening + admin system
+
+### SMTP (breaking change from Round 7)
+backend/routes/auth.js
+  - Removed devResetUrl from response entirely — reset link is emailed only,
+    never returned to the client or shown in the UI.
+  - SMTP config is checked BEFORE any DB lookup, so the response is identical
+    (503) regardless of whether the requested email exists — the earlier
+    dev-mode version would have leaked registration status once devResetUrl
+    was removed naively (existing emails → different code path than
+    nonexistent ones). Fixed by gating on SMTP config upfront.
+frontend/src/pages/ForgotPassword.jsx — removed dev-link display UI entirely.
+
+### Admin system
+backend/models/User.js         + isAdmin (bool, default false)
+backend/models/LoginEvent.js   userId, timestamp, ipAddress, userAgent
+backend/middleware/adminMiddleware.js
+  Chains after auth; re-checks isAdmin from DB on every request (not from JWT)
+  so revoking access takes effect immediately, not after token expiry.
+backend/routes/admin.js
+  GET /users            — summary list (stats + last login per user, no N+1:
+                           login lookup done via one aggregation)
+  GET /users/:id        — full per-user detail: profile + session/mock/
+                           sectional/topic/goal counts + dailyMinutes (same
+                           shape as /sessions/stats, for charting) + last 20 logins
+  GET /users/:id/logins — that user's login history (last 100)
+  GET /logins           — global login feed across all users (last 200)
+
+Bootstrap mechanism: ADMIN_EMAILS env var (comma-separated). On login, if the
+user's email matches, isAdmin is set true automatically — no admin UI needed
+to create the first admin account. Login route also now records every
+successful login to LoginEvent (fire-and-forget, never blocks the login itself
+if the write fails).
+
+frontend/src/
+  components/layout/AdminRoute.jsx   like ProtectedRoute, but also fetches
+                                       profile and checks isAdmin, redirecting
+                                       non-admins to /dashboard
+  pages/AdminUsers.jsx                user list, click through to detail
+  pages/AdminUserDetail.jsx           reuses AdmitCardStat + StudyChart (same
+                                       components the user's own dashboard
+                                       uses) for a genuinely "dashboard-style"
+                                       read-only view, not a bare data table
+Sidebar + MobileNav: both fetch isAdmin via getProfile() on mount and
+conditionally show an "Admin" link (desktop: above Settings; mobile: inside
+the "More" sheet, not the primary tab bar).
+
+## Round 9 — OTP login (email or phone)
+
+backend/models/User.js   + phone (unique, sparse), otpHash, otpExpires, otpRequestedAt
+backend/routes/auth.js
+  POST /otp/request  — accepts an email OR phone, auto-detects which (regex),
+                        checks the relevant channel is configured BEFORE any DB
+                        lookup (same leak-prevention pattern as forgot-password),
+                        60s cooldown per user, 6-digit code hashed (sha256) before
+                        storage, 10-min expiry. Code is only ever sent via the
+                        channel — never returned in the response.
+  POST /otp/verify   — consumes the code, issues the same JWT + records the same
+                        LoginEvent as password login, including the ADMIN_EMAILS
+                        auto-grant check.
+  sendOtpEmail()     — via existing SMTP config (nodemailer)
+  sendOtpSms()       — via Twilio's REST API using raw fetch (no SDK dependency,
+                        consistent with how the Gemini integration was built)
+backend/routes/user.js   PUT /profile now also accepts phone (validated,
+                          uniqueness-checked, same pattern as email)
+
+frontend/src/
+  pages/OtpLogin.jsx   two-step form: identifier -> 6-digit code -> logged in
+  context/AuthContext.jsx  + loginWithOtp()
+  pages/Login.jsx      + "Log in with a code instead" button
+  pages/Settings.jsx   ProfileSection now includes an optional phone field
+
+Live-tested: both otp/request paths (email unconfigured, phone unconfigured)
+correctly 503 before touching the DB; invalid/missing identifier correctly 400;
+otp/verify correctly reaches the DB layer (confirmed via the same Mongo-buffering-
+timeout signature seen throughout — sandbox has no Mongo connection, not a bug).
+
+## Round 10 — push notifications + leaderboard (final two items from the original roadmap)
+
+### Push notifications
+backend/models/PushSubscription.js   userId, endpoint (unique), keys {p256dh, auth}
+backend/lib/push.js                  sendPushToUser(), isPushConfigured() — lazy-
+                                       requires web-push only inside functions, so
+                                       the whole server still boots fine even if
+                                       web-push isn't installed yet (verified: ran
+                                       the scheduler start-up path directly, no crash)
+backend/lib/streakReminder.js        in-process hourly-check/once-daily-fire
+                                       scheduler; sends a push at 8 PM server time
+                                       to any user with streak > 0 who hasn't
+                                       studied today. No-ops entirely if push isn't
+                                       configured.
+backend/routes/push.js               GET /public-key, POST /subscribe,
+                                       POST /unsubscribe, POST /test
+frontend/public/sw.js                service worker: push + notificationclick handlers
+frontend/src/
+  main.jsx                            registers the service worker on load
+  components/settings/PushNotifications.jsx   enable/disable/test UI, handles the
+                                       full browser Push API subscribe flow
+                                       (permission request, VAPID key conversion,
+                                       PushManager.subscribe)
+
+### Leaderboard
+backend/models/User.js         + leaderboardOptIn (bool, default false)
+backend/routes/leaderboard.js  GET / — opted-in users only, ranked by streak then
+                                 totalHours, explicitly excludes email/any PII
+backend/routes/user.js         + PUT /leaderboard-opt-in
+frontend/src/
+  components/settings/LeaderboardOptIn.jsx   toggle
+  pages/Leaderboard.jsx                       ranked list, medal icons top 3,
+                                                current user's row highlighted
+
+Scope note: this is a global opt-in leaderboard, not a friends-only system (no
+friend requests/connections). A true friends graph would be a larger addition
+if wanted later.
+
+Both new npm dependencies (web-push) added to package.json but not installed
+in this sandbox (no network) — confirmed the app degrades gracefully without
+it via direct testing of the scheduler startup path.
+
+Live-tested: every route in the entire application re-swept one more time with
+correct HTTP methods per route (the first pass had a test bug — POSTing to
+GET-only routes — which was caught and corrected, not a real bug). All 63
+frontend files re-validated for structural correctness.

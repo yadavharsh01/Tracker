@@ -3,9 +3,11 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
+import AdminRoute from "./components/layout/AdminRoute";
 import PageTransition from "./components/layout/PageTransition";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import OtpLogin from "./pages/OtpLogin";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -14,7 +16,10 @@ import MockTests from "./pages/MockTests";
 import SectionalTests from "./pages/SectionalTests";
 import Planner from "./pages/Planner";
 import Colleges from "./pages/Colleges";
+import Leaderboard from "./pages/Leaderboard";
 import Settings from "./pages/Settings";
+import AdminUsers from "./pages/AdminUsers";
+import AdminUserDetail from "./pages/AdminUserDetail";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -27,6 +32,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/otp-login" element={<OtpLogin />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -71,11 +77,35 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="/leaderboard"
+                  element={
+                    <ProtectedRoute>
+                      <Leaderboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/settings"
                   element={
                     <ProtectedRoute>
                       <Settings />
                     </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <AdminRoute>
+                      <AdminUsers />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users/:id"
+                  element={
+                    <AdminRoute>
+                      <AdminUserDetail />
+                    </AdminRoute>
                   }
                 />
                 <Route path="*" element={<NotFound />} />
